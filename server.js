@@ -21,3 +21,20 @@ app.get('/notes', (req, res) => {
     const data = JSON.parse(fs.readFileSync('db.json'));
     res.json(data);
   });
+
+  app.post('/api/notes', (req, res) => {
+    const newNote = req.body;
+    newNote.id = uuidv4();
+  
+    const existingNotes = JSON.parse(fs.readFileSync('db.json'));
+    existingNotes.push(newNote);
+  
+    fs.writeFileSync('db.json', JSON.stringify(existingNotes));
+    res.json(newNote);
+  });
+
+//   Add delete route here as bonus
+
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
