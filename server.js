@@ -1,10 +1,10 @@
 const express = require('express');
 const fs = require('fs');
 const path = require("path");
-const routeNote = require('./routes/note')
+const routeNote = require('./routes/note.js')
 const uuid = require('uuid');
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -14,28 +14,72 @@ app.get('/notes', (req, res) => {
     res.sendFile(__dirname + '/public/notes.html');
   });
   
-  app.get('*', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
-  });
+  app.get('*', (req, res) =>
+    res.sendFile(path.join(__dirname + '/public/index.html'))
+  );
   
-  app.get('/api/notes', (req, res) => {
-    const data = JSON.parse(fs.readFileSync('/db/db.json'));
-    res.json(data);
+  app.get('/api/notes', function (req, res) {
+    fs.readFile("db/db.json", "utf-8", (err, data) => {
+      var jsonData = JSON.parse(data);
+      console.log(err);
+      console.log(data);
+      res.json(jsonData);
+    });
+    // const data = JSON.parse(fs.readFileSync('/db/db.json'));
+    // res.json(data);
   });
 
+  function readDbNotes() {
+    const DbNotes = fs.readFileSync('db/db.json', 'utf-8')
+    return JSON.parse(DbNotes)
+  };
+
+  function saveNoteDb(data) {
+    fs.writeFile('db/db.json', JSON.stringify(data, null, 2), (err) => {
+      if (err) {
+        console.error('error', err);
+      } else {
+        console.log('Note has been generated!');
+      }
+    });
+  };
+
+  function addDbNote(newNote) {
+    const existDbNote = readDbNotes()
+    existDbNote.push(newNote)
+    saveNoteDb(existDbNote);
+  };
+
+  function noteRemovalDb(uuid) {
+    const existDbNote = readDbNotes()
+    const filterThruNotes = existDbNote.filter(newNote => {
+        return newNote.id !== uuid
+    })
+    saveNoteDb(filterThruNotes)
+  };
+
   app.post('/api/notes', (req, res) => {
-    const newNote = req.body;
-    newNote.id = uuid.v4();
+    if (req.body && req.body.title && req.body.text) {
+      const newNote = new routeNote(req.body.title, req.body.text, uuid.v4())
+      addDbNote(newNote)
+      res.status(201).json(newNote);
+    } else {
+      res.status(400).json('Title and text required!');
+    }
+    // newNote.id = uuid.v4();
+    // const existingNotes = JSON.parse(fs.readFileSync('./db/db.json'));
+    // existingNotes.push(newNote);
   
-    const existingNotes = JSON.parse(fs.readFileSync('./db/db.json'));
-    existingNotes.push(newNote);
-  
-    fs.writeFileSync('./db/db.json', JSON.stringify(existingNotes));
-    res.json(newNote);
+    // fs.writeFileSync('./db/db.json', JSON.stringify(existingNotes));
+    // res.json(newNote);
   });
 
 //   Add delete route here as bonus
+app.delete("/api/notes/:id", (req, res) => {
+  noteRemovalDb(req.params.id)
+  res.status(200).send()
+});
 
   app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running at http://localhost:${PORT}`);
   });
