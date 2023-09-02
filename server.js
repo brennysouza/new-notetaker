@@ -18,7 +18,7 @@ app.get('/notes', (req, res) => {
   });
   
   app.get('/api/notes', (req, res) => {
-    const data = JSON.parse(fs.readFileSync('db.json'));
+    const data = JSON.parse(fs.readFileSync('./db/db.json'));
     res.json(data);
   });
 
@@ -26,10 +26,10 @@ app.get('/notes', (req, res) => {
     const newNote = req.body;
     newNote.id = uuidv4();
   
-    const existingNotes = JSON.parse(fs.readFileSync('db.json'));
+    const existingNotes = JSON.parse(fs.readFileSync('./db/db.json'));
     existingNotes.push(newNote);
   
-    fs.writeFileSync('db.json', JSON.stringify(existingNotes));
+    fs.writeFileSync('./db/db.json', JSON.stringify(existingNotes));
     res.json(newNote);
   });
 
