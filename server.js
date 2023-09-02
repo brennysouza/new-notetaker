@@ -1,9 +1,10 @@
 const express = require('express');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
-
+const path = require("path");
+const routeNote = require('./routes/note')
+const uuid = require('uuid');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -24,7 +25,7 @@ app.get('/notes', (req, res) => {
 
   app.post('/api/notes', (req, res) => {
     const newNote = req.body;
-    newNote.id = uuidv4();
+    newNote.id = uuid.v4();
   
     const existingNotes = JSON.parse(fs.readFileSync('./db/db.json'));
     existingNotes.push(newNote);
