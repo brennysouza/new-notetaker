@@ -18,7 +18,7 @@ app.get('/notes', (req, res) => {
   });
   
   app.get('/api/notes', (req, res) => {
-    const data = JSON.parse(fs.readFileSync('./db/db.json'));
+    const data = JSON.parse(fs.readFileSync('/db/db.json'));
     res.json(data);
   });
 
