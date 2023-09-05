@@ -1,29 +1,29 @@
 const express = require('express');
 const fs = require('fs');
 const path = require("path");
-const routeNote = require('./routes/note.js')
 const uuid = require('uuid');
+const routeNote = require('./routes/routenotes');
+const PORT = process.env.PORT || 3001;
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 app.get('/notes', (req, res) => {
-    res.sendFile(__dirname + '/public/notes.html');
+    res.sendFile(path.join(__dirname, './public/notes.html'));
   });
   
-  app.get('*', (req, res) =>
-    res.sendFile(path.join(__dirname + '/public/index.html'))
-  );
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, './public/index.html'));
+});
   
-  app.get('/api/notes', function (req, res) {
+app.get('/api/notes', function (req, res) {
     fs.readFile("db/db.json", "utf-8", (err, data) => {
-      var jsonData = JSON.parse(data);
-      console.log(err);
-      console.log(data);
-      res.json(jsonData);
+      var dataJson = JSON.parse(data);
+      // console.log(err);
+      // console.log(data);
+      res.json(dataJson);
     });
     // const data = JSON.parse(fs.readFileSync('/db/db.json'));
     // res.json(data);
