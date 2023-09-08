@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require("path");
 const uuid = require('uuid');
+const apiRoutes = require('./routes/notesapi');
 const routeNote = require('./routes/routenotes');
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -10,6 +11,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+app.use('/api', apiRoutes);
+
 app.get('/notes', (req, res) => {
     res.sendFile(path.join(__dirname, './public/notes.html'));
   });
@@ -17,17 +20,6 @@ app.get('/notes', (req, res) => {
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, './public/index.html'));
 });
-  
-app.get('/api/notes', function (req, res) {
-    fs.readFile("db/db.json", "utf-8", (err, data) => {
-      var dataJson = JSON.parse(data);
-      // console.log(err);
-      // console.log(data);
-      res.json(dataJson);
-    });
-    // const data = JSON.parse(fs.readFileSync('/db/db.json'));
-    // res.json(data);
-  });
 
   function readDbNotes() {
     const DbNotes = fs.readFileSync('db/db.json', 'utf-8')
@@ -57,28 +49,6 @@ app.get('/api/notes', function (req, res) {
     })
     saveNoteDb(filterThruNotes)
   };
-
-  app.post('/api/notes', (req, res) => {
-    if (req.body && req.body.title && req.body.text) {
-      const newNote = new routeNote(req.body.title, req.body.text, uuid.v4())
-      addDbNote(newNote)
-      res.status(201).json(newNote);
-    } else {
-      res.status(400).json('Title and text required!');
-    }
-    // newNote.id = uuid.v4();
-    // const existingNotes = JSON.parse(fs.readFileSync('./db/db.json'));
-    // existingNotes.push(newNote);
-  
-    // fs.writeFileSync('./db/db.json', JSON.stringify(existingNotes));
-    // res.json(newNote);
-  });
-
-//   Add delete route here as bonus
-app.delete("/api/notes/:id", (req, res) => {
-  noteRemovalDb(req.params.id)
-  res.status(200).send()
-});
 
   app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
