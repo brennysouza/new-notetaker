@@ -30,11 +30,13 @@ function noteRemovalDb(uuid) {
   saveNoteDb(filterThruNotes);
 }
 
+// This code reads all notes from database
 router.get('/notes', function (req, res) {
   const dataJson = readDbNotes();
   res.json(dataJson);
 });
 
+// This code creates a new note when entered by user and saves into database
 router.post('/notes', (req, res) => {
   if (req.body && req.body.title && req.body.text) {
     const newNote = new routeNote(req.body.title, req.body.text, uuid.v4());
@@ -45,10 +47,12 @@ router.post('/notes', (req, res) => {
   }
 });
 
+// This allows note to be deleted on side bar of app but also in local database
 router.delete('/notes/:id', (req, res) => {
   const noteId = req.params.id;
   noteRemovalDb(noteId);
   res.status(200).send();
 });
 
+// Exports the router
 module.exports = router;
