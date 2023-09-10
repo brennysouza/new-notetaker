@@ -13,6 +13,8 @@ The following is a video that demonstrates the functionality of the SVG logo mak
 
 Link to repo: https://github.com/brennysouza/new-notetaker
 
+Link to Heroku: [Link to Build Log](https://dashboard.heroku.com/apps/new-notetaker/activity/builds/558f8b24-6bff-49f8-93b7-356c318c1598)
+
 ## License
 Please refer to the license found in the repo. 
 
